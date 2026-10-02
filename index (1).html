@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+  <meta charset="UTF-8">
+  <!-- Viewport: lai lapa labi izskatās telefonā -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kontaktforma</title>
+
+  <style>
+    /* Vienkāršs izskats */
+    body {
+      font-family: system-ui, sans-serif;
+      background: #f3f4f6;
+      display: flex;
+      justify-content: center;
+      padding: 40px 16px;
+    }
+    form {
+      background: white;
+      padding: 24px;
+      border-radius: 10px;
+      width: 100%;
+      max-width: 400px;
+    }
+    label { display: block; margin-top: 14px; font-weight: 600; }
+    input, textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-sizing: border-box;
+    }
+    /* Sarkana apmale, ja lauks ir kļūdains */
+    .invalid { border-color: red; }
+    /* Kļūdas teksts zem lauka */
+    .error { color: red; font-size: 14px; min-height: 18px; }
+    button {
+      margin-top: 18px;
+      width: 100%;
+      padding: 10px;
+      border: 0;
+      border-radius: 6px;
+      background: #2563eb;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    #success { color: green; margin-top: 12px; text-align: center; }
+  </style>
+</head>
+<body>
+
+  <!-- novalidate = izslēdzam pārlūka validāciju, lai strādā MŪSU JS -->
+  <form id="form" novalidate>
+    <h2>Sazinies ar mums</h2>
+
+    <label for="name">Vārds</label>
+    <input id="name" type="text">
+    <div class="error" id="nameError"></div>
+
+    <label for="email">E-pasts</label>
+    <input id="email" type="email">
+    <div class="error" id="emailError"></div>
+
+    <label for="message">Ziņa</label>
+    <textarea id="message" rows="4"></textarea>
+    <div class="error" id="messageError"></div>
+
+    <button type="submit">Nosūtīt</button>
+    <div id="success"></div>
+  </form>
+
+  <script>
+    // 1. Atrodam elementus lapā
+    const form = document.getElementById("form");
+    const success = document.getElementById("success");
+
+    // 2. Palīgfunkcija: parāda vai notīra kļūdu pie lauka
+    //    id = lauka id, text = kļūdas teksts (tukšs = nav kļūdas)
+    function setError(id, text) {
+      document.getElementById(id).classList.toggle("invalid", text !== "");
+      document.getElementById(id + "Error").textContent = text;
+    }
+
+    // 3. Palīgfunkcija: vai e-pasts izskatās pareizi?
+    //    Regex: kaut kas + @ + kaut kas + . + kaut kas
+    function isValidEmail(email) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    // 4. Kad nospiež "Nosūtīt"
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();      // neļaujam lapai pārlādēties
+      success.textContent = "";
+
+      // Paņemam vērtības; trim() noņem liekas atstarpes malās
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const message = document.getElementById("message").value.trim();
+
+      let ok = true; // pieņemam, ka viss ir labi, līdz atrodam kļūdu
+
+      // Vārds: nedrīkst būt tukšs
+      if (name === "") {
+        setError("name", "Ievadi vārdu");
+        ok = false;
+      } else {
+        setError("name", "");
+      }
+
+      // E-pasts: nedrīkst būt tukšs un jābūt pareizam formātam
+      if (!isValidEmail(email)) {
+        setError("email", "Ievadi pareizu e-pastu");
+        ok = false;
+      } else {
+        setError("email", "");
+      }
+
+      // Ziņa: vismaz 10 simboli
+      if (message.length < 10) {
+        setError("message", "Ziņai jābūt vismaz 10 simbolus garai");
+        ok = false;
+      } else {
+        setError("message", "");
+      }
+
+      // Ja viss kārtībā: parādām paziņojumu un notīrām formu
+      if (ok) {
+        success.textContent = "Paldies! Ziņa nosūtīta.";
+        form.reset();
+      }
+    });
+  </script>
+</body>
+</html>
